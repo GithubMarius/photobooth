@@ -18,7 +18,7 @@ x_space = 30
 y_space = 30
 
 # Framerate
-framerate = 15 #30
+framerate = 30 #30
 
 # Camera
 
@@ -42,6 +42,10 @@ m = 1                   #1.5 #adjust to get rid of delays
 t = 3                   #countdown time
 t_disp = 3              #image display time
 t_swipe = 3             #image display time while displaying the images
+
+# For adjusted design
+t_rand = 10             #time until random movement of person (adjusted design)
+t_move = 1
 
 # Image displaying
 

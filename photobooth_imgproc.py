@@ -7,7 +7,7 @@ Created on 16.12.2016
 import pygame
 import urllib2
 import struct
-import Image
+from PIL import Image
 from photobooth_camcon import take_picture
 from photobooth_disp import disp_preview, disp_obj
 from photobooth_settings import white, t, framerate, lbl_smile, x_space, y_space, col_w
@@ -100,7 +100,7 @@ def img_combine(ExtScreen,img_1,img_2,img_3,img_4): #combines 4 images to one an
 
     img_mode = result.mode
     img_size = result.size
-    img_data = result.tostring()
+    img_data = result.tobytes()
 
     img_pg = pygame.image.fromstring(img_data,img_size,img_mode)
     

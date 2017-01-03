@@ -7,6 +7,7 @@ Created on 16.12.2016
 import pygame
 import os
 from photobooth_settings import myfont, yellow, white, col_w, x_space, y_space, preview_w, preview_h,buttonfont, black, space, left, right, lbl_next, resultsfolder
+from copy import copy
 
 #Extends existing Screen object with addiotional methods
 class ExtendedScreen:
@@ -35,19 +36,31 @@ class ExtendedScreen:
         #Buttondescriptions
         #self.lbl_next = lbl_next
         
+        #Random Movement Variables
+        self.moved = 0
+        self.move_1 = 0
+        
         #Background color
         self.Background.fill(white)
         
-        #Show image No 1
+        #Load/Show image No 1
         imgload = pygame.image.load('img/photobooth_person1.png').convert_alpha()
-        imgload = pygame.transform.scale2x(imgload)
-        self.Background.blit(imgload,(w-(0.5*(col_w+imgload.get_width())),0.5*(h-imgload.get_height())))
+        self.img_1_normal = pygame.transform.scale2x(imgload)
+        self.Background.blit(self.img_1_normal,(w-(0.5*(col_w+self.img_1_normal.get_width())),0.5*(h-self.img_1_normal.get_height())))
         
-        #Show image No 2
+        #imgload = pygame.image.load('img/photobooth_person1_2.png').convert_alpha()
+        #self.img_1_move = pygame.transform.scale2x(imgload)
+        #self.Background.blit(self.img_1_move,(w-(0.5*(col_w+self.img_1_move.get_width())),0.5*(h-self.img_1_move.get_height())))
+        
+        #Load/Show image No 2
         imgload = pygame.image.load('img/photobooth_person2.png').convert_alpha()
-        imgload = pygame.transform.scale2x(imgload)
-        self.Background.blit(imgload,(0.5*(col_w-imgload.get_width()),0.5*(h-imgload.get_height())))
+        self.img_2_normal = pygame.transform.scale2x(imgload)
+        self.Background.blit(self.img_2_normal,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(h-self.img_2_normal.get_height())))
         
+        imgload = pygame.image.load('img/photobooth_person2_2.png').convert_alpha()
+        self.img_2_move = pygame.transform.scale2x(imgload)
+        #self.Background.blit(self.img_2_normal,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(h-self.img_2_normal.get_height())))
+                
     #Fills background with background color
     def fillbg(self):
         
@@ -57,8 +70,21 @@ class ExtendedScreen:
     #Blits on Screen Object and gives correct Rect back
     def blit(self,obj,pos = (0,0)):
         
+        if self.moved == 1:
+            
+            if self.move_1 == 1:
+                Rect = self.Screen.blit(self.img_2_move,(0.5*(col_w-self.img_2_move.get_width()),0.5*(self.height-self.img_2_move.get_height())))
+                Rect = Rect.move((self.offsetx,self.offsety))
+                pygame.display.update(Rect)
+            else:
+                pygame.draw.rect(self.Screen,white,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(self.height-self.img_2_normal.get_height()),self.img_2_normal.get_width(),self.img_2_normal.get_height()))
+                Rect = self.Screen.blit(self.img_2_normal,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(self.height-self.img_2_normal.get_height())))
+                Rect = Rect.move((self.offsetx,self.offsety))
+                pygame.display.update(Rect)
+                
+
         Rect = self.Screen.blit(obj,pos)
-        
+                
         return Rect.move((self.offsetx,self.offsety))
     
     def disp_mode(self):
@@ -70,7 +96,8 @@ class ExtendedScreen:
         disp_button(self.right,self,4,mode = 1)
         #disp_button(self.lbl_next,self,4,mode = 2)
         
-        pygame.display.flip()
+        pygame.display.flip()        
+        
     
 def calc_screen(ScreenTot,Info):
     
