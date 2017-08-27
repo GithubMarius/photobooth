@@ -10,3 +10,6 @@ class Serialrep():
     
     def reset_input_buffer(self):
         pass
+    
+    def write(self,*var):
+        pass

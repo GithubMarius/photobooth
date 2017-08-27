@@ -14,7 +14,7 @@ from photobooth_settings import white, t, framerate, lbl_smile, x_space, y_space
 import io
 import os
 
-def countdown_img(Screen,Info,link,Clock,pos): #Gives countdown and takes image
+def countdown_img(ExtScreen,Ser,link,Clock,pos): #Gives countdown and takes image
 
     #Open stream               
     stream = urllib2.urlopen(link)
@@ -23,6 +23,9 @@ def countdown_img(Screen,Info,link,Clock,pos): #Gives countdown and takes image
     cd_prev = t #Needed to see,whether new countdown number
 
     while True:
+        
+        Ser.write(struct.pack('!B',0))
+        Ser.write(struct.pack('!B',cd_prev))
         
         #Limit framerate
         Clock.tick(framerate)
@@ -41,23 +44,30 @@ def countdown_img(Screen,Info,link,Clock,pos): #Gives countdown and takes image
             img_bytes = pygame.image.load(io.BytesIO(imgdata))
 
             if cd_prev != cd:
-                Screen.fill(white)
+                ExtScreen.fillbg()
 
-            disp_preview(img_bytes,Screen,Info,pos)
+            Rect = disp_preview(img_bytes,ExtScreen,pos)
             
-            disp_obj(str(cd),Screen,Info,white,0)
-                            
+            disp_obj(str(int(cd)),ExtScreen,white,0,Rect)
+                                        
             cd_prev = cd
         
         else:
+            Ser.write(struct.pack('!B',1))
+            Ser.write(struct.pack('!B',2))
+            Ser.write(struct.pack('!B',3))
             break
 
     #Display smiley
-    disp_obj(lbl_smile,Screen,Info,white,1)
-    
+    disp_obj(lbl_smile,ExtScreen,white,1)
     #Take picure, receive it and return
+    
     img_link = take_picture()
+    
     img_res = Image.open(io.BytesIO(urllib2.urlopen(img_link).read()))
+        
+    Ser.write(struct.pack('!B',0))
+        
     return img_res
 
 def img_combine(ExtScreen,img_1,img_2,img_3,img_4): #combines 4 images to one and returns the results

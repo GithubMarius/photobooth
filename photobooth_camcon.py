@@ -16,7 +16,7 @@ def post_method(method,par = []): #general post_method for communication with ca
 
     payload =  {'method': method, 'params': par, 'id': 1, 'version': '1.0'}
     data = json.dumps(payload)
-    requests.post(url, data=data)
+    return requests.post(url, data=data)
 
 def start_liveview(): #start camera liveview
 

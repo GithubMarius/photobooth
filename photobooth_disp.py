@@ -7,7 +7,9 @@ Created on 16.12.2016
 import pygame
 import os
 from photobooth_settings import myfont, yellow, white, col_w, x_space, y_space, preview_w, preview_h,buttonfont, black, space, left, right, lbl_next, resultsfolder
-from copy import copy
+import time
+
+#from copy import copy
 
 #Extends existing Screen object with addiotional methods
 class ExtendedScreen:
@@ -45,20 +47,38 @@ class ExtendedScreen:
         
         #Load/Show image No 1
         imgload = pygame.image.load('img/photobooth_person1.png').convert_alpha()
-        self.img_1_normal = pygame.transform.scale2x(imgload)
+        imgload = pygame.transform.scale2x(imgload)
+        
+        self.img_1_normal = pygame.Surface((imgload.get_width(),imgload.get_height()))
+        self.img_1_normal.fill(white)
+        self.img_1_normal.blit(imgload,(0,0))
+        
         self.Background.blit(self.img_1_normal,(w-(0.5*(col_w+self.img_1_normal.get_width())),0.5*(h-self.img_1_normal.get_height())))
         
-        #imgload = pygame.image.load('img/photobooth_person1_2.png').convert_alpha()
-        #self.img_1_move = pygame.transform.scale2x(imgload)
+        imgload = pygame.image.load('img/photobooth_person1_2.png').convert_alpha()
+        imgload = pygame.transform.scale2x(imgload)
+        
+        self.img_1_move = pygame.Surface((imgload.get_width(),imgload.get_height()))
+        self.img_1_move.fill(white)
+        self.img_1_move.blit(imgload,(0,0))
         #self.Background.blit(self.img_1_move,(w-(0.5*(col_w+self.img_1_move.get_width())),0.5*(h-self.img_1_move.get_height())))
         
         #Load/Show image No 2
         imgload = pygame.image.load('img/photobooth_person2.png').convert_alpha()
-        self.img_2_normal = pygame.transform.scale2x(imgload)
+        imgload = pygame.transform.scale2x(imgload)
+        
+        self.img_2_normal = pygame.Surface((imgload.get_width(),imgload.get_height()))
+        self.img_2_normal.fill(white)
+        self.img_2_normal.blit(imgload,(0,0))
+        
         self.Background.blit(self.img_2_normal,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(h-self.img_2_normal.get_height())))
         
         imgload = pygame.image.load('img/photobooth_person2_2.png').convert_alpha()
-        self.img_2_move = pygame.transform.scale2x(imgload)
+        imgload = pygame.transform.scale2x(imgload)
+        
+        self.img_2_move = pygame.Surface((imgload.get_width(),imgload.get_height()))
+        self.img_2_move.fill(white)
+        self.img_2_move.blit(imgload,(0,0))
         #self.Background.blit(self.img_2_normal,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(h-self.img_2_normal.get_height())))
                 
     #Fills background with background color
@@ -73,30 +93,42 @@ class ExtendedScreen:
         if self.moved == 1:
             
             if self.move_1 == 1:
+                Rect = self.Screen.blit(self.img_1_move,(self.width-(0.5*(col_w+self.img_1_normal.get_width())),0.5*(self.height-self.img_1_normal.get_height())))
+                Rect = Rect.move((self.offsetx,self.offsety))
+                pygame.display.update(Rect)
+            else:
+                Rect = self.Screen.blit(self.img_1_normal,(self.width-(0.5*(col_w+self.img_1_normal.get_width())),0.5*(self.height-self.img_1_normal.get_height())))
+                Rect = Rect.move((self.offsetx,self.offsety))
+                pygame.display.update(Rect)
+            
+            if self.move_2 == 1:
                 Rect = self.Screen.blit(self.img_2_move,(0.5*(col_w-self.img_2_move.get_width()),0.5*(self.height-self.img_2_move.get_height())))
                 Rect = Rect.move((self.offsetx,self.offsety))
                 pygame.display.update(Rect)
             else:
-                pygame.draw.rect(self.Screen,white,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(self.height-self.img_2_normal.get_height()),self.img_2_normal.get_width(),self.img_2_normal.get_height()))
                 Rect = self.Screen.blit(self.img_2_normal,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(self.height-self.img_2_normal.get_height())))
                 Rect = Rect.move((self.offsetx,self.offsety))
                 pygame.display.update(Rect)
                 
+            self.moved = 0
 
         Rect = self.Screen.blit(obj,pos)
                 
         return Rect.move((self.offsetx,self.offsety))
     
-    def disp_mode(self):
+    def disp_mode(self,mode = 1, noup = 1):
         
         self.fillbg()
         
-        disp_button(self.space,self,1,mode = 1)
-        disp_button(self.left,self,3,mode = 1)
-        disp_button(self.right,self,4,mode = 1)
+        if mode == 1:
+        
+            disp_button(self.space,self,1,mode = 1)
+            disp_button(self.left,self,3,mode = 1)
+            disp_button(self.right,self,4,mode = 1)
         #disp_button(self.lbl_next,self,4,mode = 2)
         
-        pygame.display.flip()        
+        if noup == 0:
+            pygame.display.flip()        
         
     
 def calc_screen(ScreenTot,Info):
@@ -115,7 +147,7 @@ def calc_screen(ScreenTot,Info):
     #Calc main Surface position    
     px = (Info.current_w - w)/2
     py = (Info.current_h - h)/2
-    
+
     #Create Subsurface
     Screen = ScreenTot.subsurface((px,py,w,h))
     
@@ -124,7 +156,7 @@ def calc_screen(ScreenTot,Info):
     
     return ExtScreen
 
-def disp_obj(obj,ExtScreen,color = white,objtype = 1): #displays an object depending on the wanted position
+def disp_obj(obj,ExtScreen,color = white,objtype = 1, RectIn = None): #displays an object depending on the wanted position
 
     # objtype == 1 => Fill screen
     if objtype == 1:
@@ -139,6 +171,10 @@ def disp_obj(obj,ExtScreen,color = white,objtype = 1): #displays an object depen
     
     #If objtype == 1, whole screen has to be updated
     if objtype != 1:
+        
+        if RectIn != None:
+            Rect = RectIn.union(Rect)
+        
         pygame.display.update(Rect)
     else:
         pygame.display.flip()
@@ -171,7 +207,8 @@ def disp_preview(obj,ExtScreen,pos = 1):
         Rect = ExtScreen.blit(obj, (0.5*ExtScreen.width+0.5*x_space,0.5*ExtScreen.height+0.5*y_space))
     
     #Update display
-    pygame.display.update(Rect)
+    #pygame.display.update(Rect)
+    return Rect
     
 #Display buttons (button icons)
 def disp_button(obj,ExtScreen,pos = 1,mode = 1):
@@ -252,6 +289,7 @@ def disp_img(ExtScreen,img_num):
     
     img = pygame.image.load(resultsfolder + '/' + list_imgs[img_num])
     
-    disp_obj(img,ExtScreen)
+    ExtScreen.disp_mode(1,1)
+    disp_obj(img,ExtScreen,white,0)
     
     return img_num
