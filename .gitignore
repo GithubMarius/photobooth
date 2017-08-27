@@ -3,5 +3,9 @@
 #################
 
 resultsfine/*
+results/*
+org/*
 
-!resultsfine/gitkeep.gitignor
+!resultsfine/gitkeep.gitignore
+!results/gitkeep.gitignore
+!org/gitkeep.gitignore
