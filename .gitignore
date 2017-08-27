@@ -1,0 +1,7 @@
+#################
+## Photobooth
+#################
+
+resultsfine/*
+
+!resultsfine/gitkeep.gitignor
