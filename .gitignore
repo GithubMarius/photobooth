@@ -25,4 +25,5 @@ __pycache__/*
 .pydevproject
 .project
 camcon_test.py
+tasks.txt
 !.gitignore
