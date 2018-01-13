@@ -16,7 +16,7 @@ def set_keys(pygame,Ser,num_keys):
     
     for _ in repeat(None, num_keys):
         w = True
-        print len(keys)
+        print(len(keys))
         while w == True:
             if Ser.in_waiting >= 2:
                 #Check whether number = 0 at end or not (0 is not relevant)

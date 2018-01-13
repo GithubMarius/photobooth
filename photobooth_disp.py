@@ -8,6 +8,7 @@ import pygame
 import os
 from photobooth_settings import myfont, yellow, white, col_w, x_space, y_space, preview_w, preview_h,buttonfont, black, space, left, right, lbl_next, resultsfolder
 import time
+import glob
 
 #from copy import copy
 
@@ -163,8 +164,12 @@ def disp_obj(obj,ExtScreen,color = white,objtype = 1, RectIn = None): #displays 
         ExtScreen.fillbg()
 
     # isstring? => render font
-    if isinstance(obj, basestring):
-        obj = myfont.render(obj, True, yellow)
+    try:
+        if isinstance(obj, basestring):
+            obj = myfont.render(obj, True, yellow)
+    except NameError:
+        if isinstance(obj, str):
+            obj = myfont.render(obj, True, yellow)
         
     #disp on screen
     Rect = ExtScreen.blit(obj, ((ExtScreen.width-obj.get_width())/2,(ExtScreen.height-obj.get_height())/2))
@@ -279,7 +284,7 @@ def disp_chart(ExtScreen,ticks_st,ticks_en,t):
 
 def disp_img(ExtScreen,img_num):
     
-    list_imgs = os.listdir(resultsfolder)
+    list_imgs = glob.glob('./'+resultsfolder+'/*.jpg')
     len_imgs = len(list_imgs)
     
     if len_imgs == img_num:
@@ -287,7 +292,7 @@ def disp_img(ExtScreen,img_num):
     elif img_num < 0:
         img_num = len_imgs-1
     
-    img = pygame.image.load(resultsfolder + '/' + list_imgs[img_num])
+    img = pygame.image.load(list_imgs[img_num])
     
     ExtScreen.disp_mode(1,1)
     disp_obj(img,ExtScreen,white,0)

@@ -5,50 +5,60 @@ Created on 16.12.2016
 '''
 
 import pygame
-import urllib2
 import struct
 from PIL import Image
-from photobooth_camcon import take_picture
+from photobooth_camcon import take_picture, readImgBytes, post_method, start_liveview
 from photobooth_disp import disp_preview, disp_obj
-from photobooth_settings import white, t, framerate, lbl_smile, x_space, y_space, col_w
+from photobooth_settings import white, t, framerate, lbl_smile, x_space, y_space, col_w, externalFlash, prevIso, prevF, prevS
 import io
 import os
+import time
 
-def countdown_img(ExtScreen,Ser,link,Clock,pos): #Gives countdown and takes image
+try:
+    import urllib2
+except ImportError:
+    import urllib as urllib2 
 
-    #Open stream               
-    stream = urllib2.urlopen(link)
+def countdown_img(ExtScreen,Ser,link,Clock,pos,takeIso,takeF,takeS): #Gives countdown and takes image
+            
+    if externalFlash == 1:
+        post_method('setIsoSpeedRate',[prevIso])
+        post_method('setFNumber',[prevF])
+        post_method('setShutterSpeed',[prevS])
+        
+    #Open stream
+    try:
+        stream = urllib2.urlopen(link)
+    except AttributeError:
+        stream = urllib2.request.urlopen(link)
 
     t_st = pygame.time.get_ticks()/1000 #ticks for moment of start (=ms)/(1000ms/s)
     cd_prev = t #Needed to see,whether new countdown number
 
     while True:
         
+        time.sleep(.05)
+
         Ser.write(struct.pack('!B',0))
-        Ser.write(struct.pack('!B',cd_prev))
+        Ser.write(struct.pack('!B',int(cd_prev)))
         
         #Limit framerate
         Clock.tick(framerate)
 
         t_en = pygame.time.get_ticks()/1000 #ticks for moment of start (=ms)/(1000ms/s)
     
-        cd = t_st-t_en+t #countdown
+        cd = int(t_st-t_en+t) #countdown
     
         if cd > 0:
             
-            data = stream.read(136)
-
-            size = struct.unpack('>i','\x00'+data[12:15])[0]
-            imgdata = stream.read(size)
-
-            img_bytes = pygame.image.load(io.BytesIO(imgdata))
+            pygameImg = readImgBytes(stream)
 
             if cd_prev != cd:
                 ExtScreen.fillbg()
 
-            Rect = disp_preview(img_bytes,ExtScreen,pos)
+            Rect = disp_preview(pygameImg,ExtScreen,pos)
             
-            disp_obj(str(int(cd)),ExtScreen,white,0,Rect)
+            disp_obj(str(cd),ExtScreen,white,0,Rect)
                                         
             cd_prev = cd
         
@@ -58,13 +68,18 @@ def countdown_img(ExtScreen,Ser,link,Clock,pos): #Gives countdown and takes imag
             Ser.write(struct.pack('!B',3))
             break
 
+    if externalFlash == 1:
+        post_method('setIsoSpeedRate',[takeIso])
+        post_method('setFNumber',[takeF])
+        post_method('setShutterSpeed',[takeS])
+
     #Display smiley
     disp_obj(lbl_smile,ExtScreen,white,1)
+    
+    stream.close()
+    
     #Take picure, receive it and return
-    
-    img_link = take_picture()
-    
-    img_res = Image.open(io.BytesIO(urllib2.urlopen(img_link).read()))
+    img_res = take_picture()
         
     Ser.write(struct.pack('!B',0))
         

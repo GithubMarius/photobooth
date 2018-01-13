@@ -2,10 +2,27 @@
 ## Photobooth
 #################
 
+%Results/Org Folders
 resultsfine/*
 results/*
 org/*
 
+#Exceptions
 !resultsfine/gitkeep.gitignore
 !results/gitkeep.gitignore
 !org/gitkeep.gitignore
+
+img/Designs/*
+SonyAPIInformation/*
+Tasks/*
+old_version/*
+Tasks/*
+alte
+__pycache__/*
+
+#Files
+*.pyc
+.pydevproject
+.project
+camcon_test.py
+!.gitignore

@@ -23,8 +23,13 @@ y_space_fine = 160
 # Framerate
 framerate = 30 #30
 
-# Camera
+#Flash Mode
+externalFlash = 1; # = 1: Change to use external flash
+prevIso = '12800'
+prevF = '4.0'
+prevS = '1/100'
 
+# Camera
 url = 'http://192.168.122.1:8080/sony/camera'
 
 preview_w = 640
@@ -38,13 +43,13 @@ white =     pygame.Color(255,255,255)
 red =       pygame.Color(255,0,0)
 
 # Port for serial
-COM = 'COM3'
+COM = 'COM4'
 
 # Time
 
 m = 1                   #1.5 #adjust to get rid of delays
-t = 4                   #countdown time
-t_disp = 10              #image display time
+t = 5                   #countdown time
+t_disp = 3              #image display time
 t_swipe = 3             #image display time while displaying the images
 t_hold = 3              #time to hold button for special task
 t_cor = 0.3             #camera trigger correction time 
