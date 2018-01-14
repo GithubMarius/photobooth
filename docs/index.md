@@ -4,5 +4,5 @@ This project is currently still under devlopment and is only tested with the NEX
 If you are able to run it, with a different camera, please contact, so I can list all camera models, that are working.
 Make sure you have the latest "Smart Remote Control" installed on your camera.
 
-Best regards
+Best regards,<br>
 Marius
