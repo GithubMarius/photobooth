@@ -3,20 +3,19 @@
 #################
 
 %Results/Org Folders
-resultsfine/*
-results/*
-org/*
+SonyPhotobooth/resultsfine/*
+SonyPhotobooth/results/*
+SonyPhotobooth/org/*
 
 #Exceptions
-!resultsfine/gitkeep.gitignore
-!results/gitkeep.gitignore
-!org/gitkeep.gitignore
+!SonyPhotobooth/resultsfine/gitkeep.gitignore
+!SonyPhotobooth/results/gitkeep.gitignore
+!SonyPhotobooth/org/gitkeep.gitignore
 
-img/Designs/*
+SonyPhotobooth/img/Designs/*
 SonyAPIInformation/*
-Tasks/*
+SonyPhotobooth/Tasks/*
 old_version/*
-Tasks/*
 alte
 __pycache__/*
 
@@ -27,5 +26,3 @@ __pycache__/*
 camcon_test.py
 tasks.txt
 !.gitignore
-.project
-.pydevproject
