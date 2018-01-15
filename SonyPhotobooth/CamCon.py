@@ -12,14 +12,8 @@ import struct
 from pygame import image
 import io
 from PIL import Image
-from urllib.request import urlopen #only on python 2.X running
+from urllib.request import urlopen
 from SonyPhotobooth.Input import getKey
-#===============================================================================
-# try:
-#     from urllib2 import urlopen
-# except ImportError:
-#     from urllib.request import urlopen
-#===============================================================================
 
 class CameraConnectionError(Exception):
     pass
@@ -44,46 +38,42 @@ class SonyCamera():
         
         payload =  {'method': method, 'params': par, 'id': 1, 'version': '1.0'}
         data = json.dumps(payload)
-        try:
-            resp = requests.post(self.url, data=data)
-            self.connected = True
-        except:
-            self.connected = False
-            raise CameraConnectionError
-            
-                
-        return resp
-    
-    def startRecMode(self):
         
-        while not self.connected:
+        while True:
             try:
-                print('Trying to start recording mode.')
-                self.postMethod('startRecMode',[])
-            except CameraConnectionError:
+                respReq = requests.post(self.url, data=data)
+                respJs = respReq.json()
+                self.connected = True
+                try:
+                    resp = respJs.get('result')[0]
+                    break
+                except:
+                    return
+            except:
+                self.connected = False
                 print('Coudln''t connect. Retry in 3s. Press Exit-Key to stop trying.')
                 Clock = self.pygame.time.Clock()
                 ticksStart = self.pygame.time.get_ticks() #ticks for moment of start (=ms)/(1000ms/s))
                 
                 while self.pygame.time.get_ticks()-ticksStart<3000:
                     Clock.tick(30)
-                    if (getKey(self.pygame,self.Ser,self.Keys,self.numKeys) == 4):
+                    if (getKey(self.pygame,self.Ser,self.Keys,self.numKeys) == self.numKeys-1):
                         print('Exit-Key pressed.')
                         raise SystemExit
-                    
-                    
+            
+            print('Try reconnecting.')
+            
+        return str(resp)
+    
+    def startRecMode(self):
+        
+        print('Starting recording mode.')
+        self.postMethod('startRecMode',[])
     
     def startLiveview(self): #start camera liveview
     
-        method = 'startLiveview'
-        par = []
-    
-        payload =  {'method': method, 'params': par, 'id': 1, 'version': '1.0'}
-        data = json.dumps(payload)
-        resp = requests.post(self.url, data=data)
-        resp_js = resp.json()
-        link = str(resp_js.get('result')[0])
-    
+        print('Starting liveview.')
+        link = self.postMethod('startLiveview',[])
         return link
     
     def takePhoto(self): #take one image and receive it

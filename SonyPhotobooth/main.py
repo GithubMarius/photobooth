@@ -10,7 +10,7 @@ def displayCheck():
     
 def initPhotobooth():
     
-    Config = ConfigParser(interpolation=ExtendedInterpolation())
+    Config = ConfigParser(interpolation=ExtendedInterpolation(),inline_comment_prefixes='#')
     Config.read('config.ini')
     
     user32 = ctypes.windll.user32
@@ -80,12 +80,12 @@ if __name__ == "__main__":
     buttonholdOrg =     pygame.image.load(Config.get('Layout-Images','imgHold')).convert_alpha()
     buttonholdMask =    pygame.image.load(Config.get('Layout-Images','imgHoldMask')).convert_alpha()
     
-    framerate =         Config.get('General','framerate')
-    tDisp =             Config.get('General','tDisp')
-    tSwipe =            Config.get('General','tSwipe')
-    tRand =             Config.get('General','tRand')
-    tMove =             Config.get('General','tMove')
-    tHold =             Config.get('General','tHold')
+    framerate =         Config.getfloat('General','framerate')
+    tDisp =             Config.getfloat('General','tDisp')
+    tSwipe =            Config.getfloat('General','tSwipe')
+    tRand =             Config.getfloat('General','tRand')
+    tMove =             Config.getfloat('General','tMove')
+    tHold =             Config.getfloat('General','tHold')
     
     #Colors    
     backgroundColor = [int(v.strip()) for v in Config.get('Layout-Colors','backgroundColor').split(',')]
@@ -111,28 +111,20 @@ if __name__ == "__main__":
     Clock = pygame.time.Clock()
     ticksStart = pygame.time.get_ticks() #ticks for moment of start (=ms)/(1000ms/s))
     
-    imgNum = 0
-    ticksMoveSt1 = 0
-    ticksMoveSt2 = 0
+    imgNum =        0
+    ticksMoveSt1 =  0
+    ticksMoveSt2 =  0
     
     #Get Iso for externalFlash calibration
-    #if externalFlash == 1:
+    if Config.get('Settings','externalFlash') == 1:
+        takeIso =   Camera.postMethod('getIsoSpeedRate')    #Get Standard Iso 
+        takeF =     Camera.postMethod('getFNumber')         #Get Standard F
+        takeS =     Camera.postMethod('getShutterSpeed')    #Get Shutter Speed
+    else:
+        takeIso = [];
+        takeF = [];
+        takeS = [];
     
-    #Get Standard Iso            
-    resp = Camera.postMethod('getIsoSpeedRate')   
-    respJs = resp.json()
-    takeIso = str(respJs.get('result')[0])
-    
-    #Get Standard F            
-    resp = Camera.postMethod('getFNumber')   
-    respJs = resp.json()
-    takeF = str(respJs.get('result')[0])
-    
-    #Get Shutter Speed            
-    resp = Camera.postMethod('getShutterSpeed')   
-    respJs = resp.json()
-    takeS = str(respJs.get('result')[0])
- 
     #Wait  for Key press
     while True:
           
@@ -184,15 +176,15 @@ if __name__ == "__main__":
             
             tick_st = pygame.time.get_ticks()
             
-            TransSurf = pygame.Surface((ExtScreen.width,ExtScreen.height), pygame.SRCALPHA) @UndefinedVariable
+            TransSurf = pygame.Surface((ExtScreen.width,ExtScreen.height), pygame.SRCALPHA) #@UndefinedVariable
             TransSurf.fill((0,0,0,128))
             
             showHoldButton = 0
             
-            while Keys[0].check_hold(pygame,Ser):
+            while Keys[0].checkHold(pygame,Ser):
                  
                 percent = float(pygame.time.get_ticks() - tick_st)/(tHold*1000)
-                 
+                
                 if percent >= 1:
                     dispObj(myfontsmall.render(lines[int(random.uniform(-0.5,len(lines)-0.501))], True, yellow),ExtScreen)
                     time.sleep(1)
@@ -215,46 +207,30 @@ if __name__ == "__main__":
                 pygame.event.get()
      
             #Try connecting to camera
-            try:
-                link = Camera.startLiveview()
-            except:
-                con = False
-                while con == False:
-                    try:
-                        link = Camera.startLiveview()
-                        con = True
-                    except:
-                        print('Connection problem')
-                        con = False
-                        
-                        keyres = getKey(pygame,Ser,Keys,numKeys)
-                        
-                        if keyres == numKeys-1:
-                            con = True
-                            exit
+            link = Camera.startLiveview()
                             
             #TODO PACK IN FOR LOOP
             ExtScreen.fillbg()
             pygame.display.flip()
                              
-            img1 = countdownImg(ExtScreen,Camera,Ser,link,Clock,1,takeIso,takeF,takeS)
+            img1 = countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,1,takeIso,takeF,takeS)
             #------------------------------------ img1 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()
                        
             #time.sleep(2)           
                         
-            img2 = countdownImg(ExtScreen,Camera,Ser,link,Clock,2,takeIso,takeF,takeS)
+            img2 = countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,2,takeIso,takeF,takeS)
             #------------------------------------ img2 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()
              
-            img3 = countdownImg(ExtScreen,Camera,Ser,link,Clock,3,takeIso,takeF,takeS)
+            img3 = countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,3,takeIso,takeF,takeS)
             #------------------------------------ img3 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()
              
-            img4 = countdownImg(ExtScreen,Camera,Ser,link,Clock,4,takeIso,takeF,takeS)
+            img4 = countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,4,takeIso,takeF,takeS)
             #------------------------------------ img4 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()

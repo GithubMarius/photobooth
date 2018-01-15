@@ -19,9 +19,9 @@ import time
 
 import urllib
 
-def countdownImg(ExtScreen,Camera,Ser,link,Clock,pos,takeIso,takeF,takeS): #Gives countdown and takes image
+def countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,pos,takeIso,takeF,takeS): #Gives countdown and takes image
     
-    if externalFlash == 1:
+    if Config.get('Settings','externalFlash') == 1:
         Camera.postMethod('setIsoSpeedRate',  [prevIso])
         Camera.postMethod('setFNumber',       [prevF])
         Camera.postMethod('setShutterSpeed',  [prevS])
@@ -75,7 +75,7 @@ def countdownImg(ExtScreen,Camera,Ser,link,Clock,pos,takeIso,takeF,takeS): #Give
     stream.close()
     
     #Take picure, receive it and return
-    img_res = Camera.takePicture()
+    img_res = Camera.takePhoto()
         
     Ser.write(struct.pack('!B',0))
         

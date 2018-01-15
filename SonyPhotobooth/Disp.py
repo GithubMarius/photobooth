@@ -127,7 +127,7 @@ class ExtendedScreen:
         #dispButton(self.lbl_next,self,4,mode = 2)
         
         if noup == 0:
-            pygame.display.flip()        
+            pygame.display.flip()
         
     
 def calcScreen(ScreenTot,Config,Info):
@@ -152,6 +152,7 @@ def calcScreen(ScreenTot,Config,Info):
     
     #Save in extended Screen-class object
     ExtScreen = ExtendedScreen(Screen,Config,px,py,w,h)
+    ExtScreen.flip = pygame.display.flip()
     
     return ExtScreen
 
@@ -282,7 +283,7 @@ def dispChart(ExtScreen,ticks_st,ticks_en,t):
 
 def dispImg(ExtScreen,img_num):
     
-    list_imgs = glob.glob('./'+resultsfolder+'/*.jpg')
+    list_imgs = glob.glob('./'+ resultsfolder +'/*.jpg')
     len_imgs = len(list_imgs)
     
     if len_imgs == img_num:

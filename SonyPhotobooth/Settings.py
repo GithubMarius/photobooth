@@ -47,8 +47,8 @@ COM = 'COM4'
 
 # Time
 
-m = 1                   #1.5 #adjust to get rid of delays
-t = 5                   #countdown time
+m = 1                   #1.5 adjust to get rid of delays
+t = 5                   #time
 t_disp = 3              #image display time
 t_swipe = 3             #image display time while displaying the images
 t_hold = 3              #time to hold button for special task
