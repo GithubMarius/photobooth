@@ -5,7 +5,8 @@ Created on 15.12.2016
 '''
 
 def displayCheck():
-    print('hi')
+    print('TO IMPLEMENT')
+    ##TO IMPLEMENT
     
 def initPhotobooth():
     
@@ -34,18 +35,15 @@ def initPhotobooth():
     else:
         ScreenTot = pygame.display.set_mode((800,450),pygame.RESIZABLE|pygame.HWSURFACE|pygame.DOUBLEBUF)
     
-    buttonholdOrg =        pygame.image.load(Config.get('Layout-Images','imgHold')).convert_alpha()
-    buttonholdMask =       pygame.image.load(Config.get('Layout-Images','imgHoldMask')).convert_alpha()
-    
     Info = pygame.display.Info() #Contains screen-size information
     
-    ExtScreen = calcScreen(ScreenTot,Info)
+    ExtScreen = calcScreen(ScreenTot,Config,Info)
     
     #Fill Background Color
     ExtScreen.fillbg()
     pygame.display.flip()
     
-    return Config, Ser, ScreenTot, buttonholdOrg, buttonholdMask, Info, ExtScreen
+    return Config, Ser, ScreenTot, Info, ExtScreen
 
 def getTasks():
     taskfile = codecs.open('tasks.txt', 'r', 'iso-8859-15')
@@ -60,15 +58,15 @@ if __name__ == "__main__":
     
     # Import of Modules
     
-    import pygame        #displaying contents on screen 
-    from SonyPhotobooth.Settings            import white, red, framerate, t_disp, t_swipe, t_rand, t_move, t_hold, myfontsmall, yellow
+    from SonyPhotobooth.Settings            import white, red, myfontsmall, yellow
     from SonyPhotobooth.ImageProcessing     import countdownImg, imgCombine
     from SonyPhotobooth.CamCon              import SonyCamera
     from SonyPhotobooth.Disp                import dispObj, calcScreen, dispChart, dispImg
     from SonyPhotobooth.Input               import setKeys, getKey, resetInputDevices
     from SonyPhotobooth.Serial              import Serialrep
-    from configparser import ConfigParser, ExtendedInterpolation
-    import serial, time, ctypes, codecs, random, sys
+    from configparser                       import ConfigParser, ExtendedInterpolation
+    
+    import pygame, serial, time, ctypes, codecs, random, sys
     import json,requests         #@UnusedImport  to send json objects
     
     if (len(sys.argv) == 2):
@@ -78,6 +76,18 @@ if __name__ == "__main__":
     #To stop windows from auto resizing
     Config, Ser, ScreenTot, buttonholdOrg, buttonholdMask, Info, ExtScreen = initPhotobooth()
     
+    # Load from Config    
+    buttonholdOrg =     pygame.image.load(Config.get('Layout-Images','imgHold')).convert_alpha()
+    buttonholdMask =    pygame.image.load(Config.get('Layout-Images','imgHoldMask')).convert_alpha()
+    
+    framerate =         Config.get('General','framerate')
+    tDisp =             Config.get('General','tDisp')
+    tSwipe =            Config.get('General','tSwipe')
+    tRand =             Config.get('General','tRand')
+    tMove =             Config.get('General','tMove')
+    tHold =             Config.get('General','tHold')
+    # Config get end
+        
     Keys = setKeys(pygame,Ser,numKeys) # Let user assign keys
     
     Camera = SonyCamera(Config.get('General','url'),pygame,Ser,Keys,numKeys)
@@ -90,7 +100,6 @@ if __name__ == "__main__":
     #Read Tasks
     if Config.get('Settings','taskMode'): lines = getTasks();
         
-    
     #Saves objects for the wished number of Keys
     
     #Initialize Clock
@@ -126,37 +135,37 @@ if __name__ == "__main__":
         Clock.tick(framerate)
      
         #random 1
-        x = random.randint(1,t_rand*framerate)
-        if x == t_rand*framerate and ticksMoveSt1 == 0:
+        x = random.randint(1,tRand*framerate)
+        if x == tRand*framerate and ticksMoveSt1 == 0:
             ticksMoveSt1 = pygame.time.get_ticks()
-            ExtScreen.move_1 = 1
-            ExtScreen.moved = 1
-        elif pygame.time.get_ticks() >= ticksMoveSt1 + t_move*1000 and ticksMoveSt1 != 0:
-            ticksMoveSt1 = 0
-            ExtScreen.move_1 = 0
-            ExtScreen.moved = 1
+            ExtScreen.move_1 =  1
+            ExtScreen.moved =   1
+        elif pygame.time.get_ticks() >= ticksMoveSt1 + tMove*1000 and ticksMoveSt1 != 0:
+            ticksMoveSt1 =      0
+            ExtScreen.move_1 =  0
+            ExtScreen.moved =   1
         else:
-            ExtScreen.moved = 0
+            ExtScreen.moved =   0
      
         #random 2
-        x = random.randint(1,t_rand*framerate)
-        if x == t_rand*framerate and ticksMoveSt2 == 0:
+        x = random.randint(1,tRand*framerate)
+        if x == tRand*framerate and ticksMoveSt2 == 0:
             ticksMoveSt2 = pygame.time.get_ticks()
-            ExtScreen.move_2 = 1
-            ExtScreen.moved = 1
-        elif pygame.time.get_ticks() >= ticksMoveSt2 + t_move*1000 and ticksMoveSt2 != 0:
-            ticksMoveSt2 = 0
-            ExtScreen.move_2 = 0
-            ExtScreen.moved = 1
+            ExtScreen.move_2 =  1
+            ExtScreen.moved =   1
+        elif pygame.time.get_ticks() >= ticksMoveSt2 + tMove*1000 and ticksMoveSt2 != 0:
+            ticksMoveSt2 =      0
+            ExtScreen.move_2 =  0
+            ExtScreen.moved =   1
         else:
-            ExtScreen.moved = 0
+            ExtScreen.moved =   0
          
         #Get pressed key
         i = getKey(pygame,Ser,Keys,numKeys)
          
         ticks_en = pygame.time.get_ticks() #ticks for moment of start (=ms)/(1000ms/s)
                  
-        if dispChart(ExtScreen,ticksStart,ticks_en,t_swipe): #returns True if time reached
+        if dispChart(ExtScreen,ticksStart,ticks_en,tSwipe): #returns True if time reached
             ticksStart = pygame.time.get_ticks()
             imgNum -= 1
             imgNum = dispImg(ExtScreen,imgNum)
@@ -177,7 +186,7 @@ if __name__ == "__main__":
             
             while Keys[0].check_hold(pygame,Ser):
                  
-                percent = float(pygame.time.get_ticks() - tick_st)/(t_hold*1000)
+                percent = float(pygame.time.get_ticks() - tick_st)/(tHold*1000)
                  
                 if percent >= 1:
                     dispObj(myfontsmall.render(lines[int(random.uniform(-0.5,len(lines)-0.501))], True, yellow),ExtScreen)
@@ -219,32 +228,33 @@ if __name__ == "__main__":
                             con = True
                             exit
                             
+            #TODO PACK IN FOR LOOP
             ExtScreen.fillbg()
             pygame.display.flip()
                              
-            img_1 = countdownImg(ExtScreen,Camera,Ser,link,Clock,1,takeIso,takeF,takeS)
-            #------------------------------------ img_1 = Image.open('img/test.jpg')
+            img1 = countdownImg(ExtScreen,Camera,Ser,link,Clock,1,takeIso,takeF,takeS)
+            #------------------------------------ img1 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()
                        
             time.sleep(2)           
                         
-            img_2 = countdownImg(ExtScreen,Camera,Ser,link,Clock,2,takeIso,takeF,takeS)
-            #------------------------------------ img_2 = Image.open('img/test.jpg')
+            img2 = countdownImg(ExtScreen,Camera,Ser,link,Clock,2,takeIso,takeF,takeS)
+            #------------------------------------ img2 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()
              
-            img_3 = countdownImg(ExtScreen,Camera,Ser,link,Clock,3,takeIso,takeF,takeS)
-            #------------------------------------ img_3 = Image.open('img/test.jpg')
+            img3 = countdownImg(ExtScreen,Camera,Ser,link,Clock,3,takeIso,takeF,takeS)
+            #------------------------------------ img3 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()
              
-            img_4 = countdownImg(ExtScreen,Camera,Ser,link,Clock,4,takeIso,takeF,takeS)
-            #------------------------------------ img_4 = Image.open('img/test.jpg')
+            img4 = countdownImg(ExtScreen,Camera,Ser,link,Clock,4,takeIso,takeF,takeS)
+            #------------------------------------ img4 = Image.open('img/test.jpg')
             ExtScreen.fillbg()
             pygame.display.flip()
              
-            img_result, img_link = imgCombine(ExtScreen,img_1,img_2,img_3,img_4)
+            img_result, img_link = imgCombine(ExtScreen,img1,img2,img3,img4)
              
             ExtScreen.dispMode(0,1)
              
@@ -253,13 +263,12 @@ if __name__ == "__main__":
             ticksStart = pygame.time.get_ticks()  #ticks for moment of start (=ms)/(1000ms/s)
              
             while True:
-                 
                 #Limit framerate
                 Clock.tick(framerate)
      
                 ticks_en = pygame.time.get_ticks() #ticks for moment of start (=ms)/(1000ms/s)
                  
-                if dispChart(ExtScreen,ticksStart,ticks_en,t_disp): #returns True if time reached
+                if dispChart(ExtScreen,ticksStart,ticks_en,tDisp): #returns True if time reached
                     break
                  
             resetInputDevices(pygame,Ser,Keys)
@@ -281,5 +290,3 @@ if __name__ == "__main__":
      
         elif i == numKeys-1:
             break
-             
-    #pygame.quit() #seems to be only in python 2.X needed

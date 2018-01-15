@@ -5,34 +5,34 @@ Created on 16.12.2016
 '''
 
 import pygame
-from SonyPhotobooth.Settings import myfont, yellow, white, col_w, x_space, y_space, preview_w, preview_h,buttonfont, black, space, left, right, resultsfolder
+from SonyPhotobooth.Settings import myfont, yellow, white, col_w, x_space, y_space, preview_w, preview_h,buttonfont, black, resultsfolder
 import glob
 
 #from copy import copy
 
-#Extends existing Screen object with addiotional methods
+#Extends existing Screen object with additional methods
 class ExtendedScreen:
     
-    def __init__(self,Screen,px,py,w,h):
+    def __init__(self,Screen,Config,px,py,w,h):
     
         #Screen object
         self.Screen = Screen
         
         #Offset (x & y)
-        self.offsetx = px
-        self.offsety = py
+        self.offsetx =  px
+        self.offsety =  py
         
         #Screen width and height
-        self.width = w
-        self.height = h
+        self.width =    w
+        self.height =   h
         
         #Create standard background
         self.Background = pygame.Surface((w,h))
         
         #Buttons
-        self.space = space
-        self.left = left
-        self.right = right
+        self.space =    pygame.image.load(Config.get('Layout-Images','imgSpace'))
+        self.left =     pygame.image.load(Config.get('Layout-Images','imgLeft'))
+        self.right =    pygame.image.load(Config.get('Layout-Images','imgRight'))
         
         #Buttondescriptions
         #self.lbl_next = lbl_next
@@ -130,7 +130,7 @@ class ExtendedScreen:
             pygame.display.flip()        
         
     
-def calcScreen(ScreenTot,Info):
+def calcScreen(ScreenTot,Config,Info):
     
     #Find smaller dimension (height or width)
     sc_w =  float(Info.current_w - 3*x_space - 2*col_w)/float(preview_w)
@@ -151,7 +151,7 @@ def calcScreen(ScreenTot,Info):
     Screen = ScreenTot.subsurface((px,py,w,h))
     
     #Save in extended Screen-class object
-    ExtScreen = ExtendedScreen(Screen,px,py,w,h)
+    ExtScreen = ExtendedScreen(Screen,Config,px,py,w,h)
     
     return ExtScreen
 

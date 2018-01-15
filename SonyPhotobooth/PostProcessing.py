@@ -19,7 +19,6 @@ for i in range(1,n/4):
     img4 = Image.open(orgfolder + '/' + files[4*(i-1)+3])
 
     #Calc size
-    
     width = 2*img1.width+3*x_space_fine
     height = 2*img1.height+3*y_space_fine
     x_right = 1*img1.width+2*x_space_fine

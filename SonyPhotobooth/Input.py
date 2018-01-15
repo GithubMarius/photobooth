@@ -8,7 +8,6 @@ Created on 16.12.2016
 from itertools import repeat
 from pygame import KEYDOWN, MOUSEBUTTONDOWN #@UnresolvedImport
 
-
 def setKeys(pygame,Ser,num_keys):
     
     #reset buffer
@@ -48,7 +47,7 @@ def getKey(pygame,Ser,keys,num_keys):
     
     for i in range(0,num_keys):
         
-        if keys[i].check_press(eventlist,ser_list) == True:
+        if keys[i].checkPress(eventlist,ser_list) == True:
             
             ret = i
             
@@ -66,7 +65,7 @@ class Key:
         else:
             self.identifier = event.button
     
-    def check_press(self,eventlist,*var):
+    def checkPress(self,eventlist,*var):
         
         for event in eventlist:
                         
@@ -76,7 +75,7 @@ class Key:
                 
         return False
     
-    def check_hold(self,pygame,*var):
+    def checkHold(self,pygame,*var):
         
         return pygame.key.get_pressed()[self.identifier]
                 
@@ -89,7 +88,7 @@ class Baud_button:
         self.num = num
         self.stat = 0
         
-    def check_press(self,ign,ser_list):
+    def checkPress(self,ign,ser_list):
 
         for i in range(0,len(ser_list)):
             
@@ -125,7 +124,7 @@ class Baud_button:
         #self.ser.reset_input_buffer()
                     
         
-    def check_hold(self,ign,Ser):
+    def checkHold(self,ign,Ser):
         
         while Ser.in_waiting >= 2:
             num_in = int(Ser.read(2))
