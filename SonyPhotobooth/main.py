@@ -52,8 +52,8 @@ def getTasks():
         lines.append(i.rstrip('\r\n'))
         return lines
 
-if __name__ == "__main__":
-      
+if __name__ == "__main__":    
+    
     numKeys = 5
     
     # Import of Modules
@@ -74,8 +74,8 @@ if __name__ == "__main__":
             displayCheck()
     
     #To stop windows from auto resizing
-    Config, Ser, ScreenTot, buttonholdOrg, buttonholdMask, Info, ExtScreen = initPhotobooth()
-    
+    Config, Ser, ScreenTot, Info, ExtScreen = initPhotobooth()
+
     # Load from Config    
     buttonholdOrg =     pygame.image.load(Config.get('Layout-Images','imgHold')).convert_alpha()
     buttonholdMask =    pygame.image.load(Config.get('Layout-Images','imgHoldMask')).convert_alpha()
@@ -86,7 +86,12 @@ if __name__ == "__main__":
     tRand =             Config.get('General','tRand')
     tMove =             Config.get('General','tMove')
     tHold =             Config.get('General','tHold')
-    # Config get end
+    
+    #Colors    
+    backgroundColor = [int(v.strip()) for v in Config.get('Layout-Colors','backgroundColor').split(',')]
+    foregroundColor = [int(v.strip()) for v in Config.get('Layout-Colors','foregroundColor').split(',')]
+    
+    # Load from Config end
         
     Keys = setKeys(pygame,Ser,numKeys) # Let user assign keys
     
@@ -237,7 +242,7 @@ if __name__ == "__main__":
             ExtScreen.fillbg()
             pygame.display.flip()
                        
-            time.sleep(2)           
+            #time.sleep(2)           
                         
             img2 = countdownImg(ExtScreen,Camera,Ser,link,Clock,2,takeIso,takeF,takeS)
             #------------------------------------ img2 = Image.open('img/test.jpg')
