@@ -5,10 +5,7 @@ Created on 16.12.2016
 '''
 
 #Import libraries
-
-import requests        #to communicate with the camera
-import json            #to send json objects
-import struct
+import requests, json, struct        #to communicate with the camera, send json objects, structs
 from pygame import image
 import io
 from PIL import Image
@@ -41,11 +38,10 @@ class SonyCamera():
         
         while True:
             try:
-                respReq = requests.post(self.url, data=data)
-                respJs = respReq.json()
+                respReq = requests.post(self.url, data=data).json()
                 self.connected = True
                 try:
-                    resp = respJs.get('result')[0]
+                    resp = respReq.get('result')[0]
                     break
                 except:
                     return
@@ -73,8 +69,7 @@ class SonyCamera():
     def startLiveview(self): #start camera liveview
     
         print('Starting liveview.')
-        link = self.postMethod('startLiveview',[])
-        return link
+        self.link = self.postMethod('startLiveview',[])
     
     def takePhoto(self): #take one image and receive it
     
@@ -83,11 +78,10 @@ class SonyCamera():
     
         payload =  {'method': method, 'params': par, 'id': 1, 'version': '1.0'}
         data = json.dumps(payload)
-        resp = requests.post(self.url, data=data)
-        resp_js = resp.json()
-        res_con = str(resp_js.get('result')[0][0])
+        resp = requests.post(self.url, data=data).json()
+        resCon = str(resp.get('result')[0][0]) #[0][0] instead of [0]
         
-        byteRes = io.BytesIO(urlopen(res_con).read());
+        byteRes = io.BytesIO(urlopen(resCon).read());
         photo = Image.open(byteRes)
     
         return photo
@@ -95,7 +89,7 @@ class SonyCamera():
     def readImgBytes(self,stream):
     
         data = stream.read(136)
-        size = struct.unpack('>i',b'\x00'+data[12:15])[0]
+        size = struct.unpack('>i',b'\x00'+data[12:15])[0] #Take relevant bytes
         imgData = stream.read(size)
         pygameImg = image.load(io.BytesIO(imgData))
     

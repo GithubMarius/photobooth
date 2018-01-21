@@ -5,7 +5,7 @@ setup(name='SonyPhotobooth',
       py_modules=['SonyPhotobooth'],
       description='Photobooth for Sony Cameras',
       author='Marius Hofmann',
-      email='programmiermarius@yahoo.de',
+      author_email='programmiermarius@yahoo.de',
       url='https://github.com/GithubMarius/SonyPhotobooth',
-      packages=['SonyPhotobooth','SonyPhotobooth.CamCon','SonyPhotobooth.ImageProcessing','SonyPhotobooth.Input','SonyPhotobooth.PostProcessing','SonyPhotobooth.Serial','SonyPhotobooth.Disp']
+      modules=['SonyPhotobooth','SonyPhotobooth.CamCon','SonyPhotobooth.ImageProcessing','SonyPhotobooth.Input','SonyPhotobooth.PostProcessing','SonyPhotobooth.Serial','SonyPhotobooth.Disp']
       )

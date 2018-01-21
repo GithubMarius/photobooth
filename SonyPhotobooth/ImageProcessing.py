@@ -8,7 +8,7 @@ import pygame
 import struct
 from PIL import Image
 from SonyPhotobooth.Disp        import dispPreview, dispObj
-from SonyPhotobooth.Settings    import white, t, framerate, lbl_smile, x_space, y_space, col_w, externalFlash, prevIso, prevF, prevS
+from SonyPhotobooth.Settings    import white, t, lbl_smile, x_space, y_space, col_w, prevIso, prevF, prevS
 import os
 import time
 
@@ -19,14 +19,14 @@ import time
 
 import urllib
 
-def countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,pos,takeIso,takeF,takeS): #Gives countdown and takes image
+def countdownImg(ExtScreen,Camera,Config,State,Ser,Clock,pos): #Gives countdown and takes image
     
     if Config.get('Settings','externalFlash') == 1:
         Camera.postMethod('setIsoSpeedRate',  [prevIso])
         Camera.postMethod('setFNumber',       [prevF])
         Camera.postMethod('setShutterSpeed',  [prevS])
         
-    stream = urllib.request.urlopen(link)
+    stream = urllib.request.urlopen(Camera.link)
 
     t_st = pygame.time.get_ticks()/1000 #ticks for moment of start (=ms)/(1000ms/s)
     cd_prev = t #Needed to see,whether new countdown number
@@ -39,7 +39,7 @@ def countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,pos,takeIso,takeF,takeS)
         Ser.write(struct.pack('!B',int(cd_prev)))
         
         #Limit framerate
-        Clock.tick(framerate)
+        Clock.tick()
 
         t_en = pygame.time.get_ticks()/1000 #ticks for moment of start (=ms)/(1000ms/s)
     
@@ -50,7 +50,7 @@ def countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,pos,takeIso,takeF,takeS)
             pygameImg = Camera.readImgBytes(stream)
 
             if cd_prev != cd:
-                ExtScreen.fillbg()
+                ExtScreen.fillbg(False)
 
             Rect = dispPreview(pygameImg,ExtScreen,pos)
             
@@ -64,10 +64,10 @@ def countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,pos,takeIso,takeF,takeS)
             Ser.write(struct.pack('!B',3))
             break
 
-    if externalFlash == 1:
-        Camera.postMethod('setIsoSpeedRate',[takeIso])
-        Camera.postMethod('setFNumber',[takeF])
-        Camera.postMethod('setShutterSpeed',[takeS])
+    if Config.get('Settings','externalFlash') == 1:
+        Camera.postMethod('setIsoSpeedRate',[State.takeIso])
+        Camera.postMethod('setFNumber',[State.takeF])
+        Camera.postMethod('setShutterSpeed',[State.takeS])
 
     #Display smiley
     dispObj(lbl_smile,ExtScreen,white,1)
@@ -78,15 +78,17 @@ def countdownImg(ExtScreen,Camera,Config,Ser,link,Clock,pos,takeIso,takeF,takeS)
     img_res = Camera.takePhoto()
         
     Ser.write(struct.pack('!B',0))
-        
+    
+    ExtScreen.fillbg()
+    
     return img_res
 
-def imgCombine(ExtScreen,img_1,img_2,img_3,img_4): #combines 4 images to one and returns the results
+def imgCombine(ExtScreen,Imgs): #combines 4 images to one and returns the results
 
     x = ExtScreen.width/2 - col_w
     y = ExtScreen.height/2
 
-    o_width, o_height = img_1.size
+    o_width, o_height = Imgs[0].size
 
     n_width = x-1.5*x_space
     n_height = y-1.5*y_space
@@ -101,17 +103,15 @@ def imgCombine(ExtScreen,img_1,img_2,img_3,img_4): #combines 4 images to one and
 
     size = int(s_width),int(s_height)
 
-    img_1 = img_1.resize(size)
-    img_2 = img_2.resize(size)
-    img_3 = img_3.resize(size)
-    img_4 = img_4.resize(size)
-
     result = Image.new("RGB", (int(r_width), int(r_height)), "white")
+    
+    for i in range(0,4):
+        Imgs[i] = Imgs[i].resize(size)
 
-    result.paste(img_1,(int(x_space),int(y_space)))
-    result.paste(img_2,(int(2 * x_space + s_width),int(y_space)))
-    result.paste(img_3,(int(x_space),int(2 * y_space + s_height)))
-    result.paste(img_4,(int(2 * x_space + s_width),int(2 * y_space + s_height)))
+    result.paste(Imgs[0],(int(x_space),int(y_space)))
+    result.paste(Imgs[1],(int(2 * x_space + s_width),int(y_space)))
+    result.paste(Imgs[2],(int(x_space),int(2 * y_space + s_height)))
+    result.paste(Imgs[3],(int(2 * x_space + s_width),int(2 * y_space + s_height)))
 
     img_num_folder = str(len(os.listdir("results")) + 1)
 
@@ -125,4 +125,4 @@ def imgCombine(ExtScreen,img_1,img_2,img_3,img_4): #combines 4 images to one and
 
     img_pg = pygame.image.fromstring(img_data,img_size,img_mode)
     
-    return img_pg, img_link
+    return img_pg #, img_link

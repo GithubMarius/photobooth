@@ -78,13 +78,20 @@ class ExtendedScreen:
         self.img_2_move = pygame.Surface((imgload.get_width(),imgload.get_height()))
         self.img_2_move.fill(white)
         self.img_2_move.blit(imgload,(0,0))
+        
         #self.Background.blit(self.img_2_normal,(0.5*(col_w-self.img_2_normal.get_width()),0.5*(h-self.img_2_normal.get_height())))
                 
     #Fills background with background color
-    def fillbg(self):
+    def fillbg(self, flip = True):
         
         #self.Screen.fill(white)
         self.blit(self.Background)
+        
+        if flip:
+            self.flip()
+        
+    def flip(self):
+        pygame.display.flip()
     
     #Blits on Screen Object and gives correct Rect back
     def blit(self,obj,pos = (0,0)):
@@ -152,7 +159,6 @@ def calcScreen(ScreenTot,Config,Info):
     
     #Save in extended Screen-class object
     ExtScreen = ExtendedScreen(Screen,Config,px,py,w,h)
-    ExtScreen.flip = pygame.display.flip()
     
     return ExtScreen
 
@@ -264,19 +270,20 @@ def dispButton(obj,ExtScreen,pos = 1,mode = 1):
     #Update display
     pygame.display.update(Rect)
     
-def dispChart(ExtScreen,ticks_st,ticks_en,t):
-
-    chart_pos = (ticks_en-ticks_st)*100/t/1000
+def dispChart(ExtScreen,ticksDiff,t):
+    
+    #Calculate chartPos (*100 for position (100 pixels wide) / :1000 for convertion in seconds from ms)
+    chartPos = (ticksDiff)*100/t/1000
 
     #Display time scale
     chart = pygame.Surface((100, 40))
     chart.fill(black)
-    pygame.draw.rect(chart,white,pygame.Rect((100-chart_pos),0,100,40))
+    pygame.draw.rect(chart,white,pygame.Rect((100-chartPos),0,100,40))
 
     #Print
     dispButton(chart,ExtScreen,2)
     
-    if ticks_en-ticks_st >= t*1000:
+    if ticksDiff >= t*1000:
         return True
     
     return False

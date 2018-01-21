@@ -31,7 +31,7 @@ def setKeys(pygame,Ser,num_keys):
                         keys.append(Key(event))
                         w = False
                         
-        print(str(len(keys)) + ' Keys set')
+        print(str(len(keys)) + '/' + str(num_keys) + ' Keys set')
         
     return keys
 
@@ -101,28 +101,7 @@ class Baud_button:
             elif num_in == self.num-1:
                 self.stat = 0
                     
-        return False
-        
-        #=======================================================================
-        # #Receive data and check whether is int
-        # try:
-        #     rec = 0 #int(self.Ser.read(2))
-        #     
-        #     if rec == self.num:
-        #         self.stat = 1
-        #         return True
-        #         
-        #     elif rec == self.num-1:
-        #         self.stat = 0
-        #     
-        # except:
-        #     pass
-        # 
-        # return False
-        #=======================================================================
-
-        #self.ser.reset_input_buffer()
-                    
+        return False                    
         
     def checkHold(self,ign,Ser):
         
@@ -132,8 +111,8 @@ class Baud_button:
                 self.stat = 0
                 
         return self.stat
-        
-def resetInputDevices(pygame,Ser,Keys):
+
+def resetInput(pygame,Ser,Keys):
     
     pygame.event.clear()
     Ser.reset_input_buffer()
